@@ -40,7 +40,7 @@ export default defineConfig({
 
 On localhost it works without a key, on a shared demo key. A deployed site needs its own: pass it as `starlightOnetagTranslate({ key: "ot_..." })` or set `PUBLIC_ONETAG_KEY` in `.env`. Without one, readers see a line saying AI is not set up, and the build prints a warning.
 
-Fill in your email at [onetagai.com](https://onetagai.com/?ref=starlight-onetag-translate), or run this; the key arrives in that inbox (one key per email, 1,000,000 free tokens a month):
+Fill in your email at [onetagai.com](https://onetagai.com/?ref=starlight-onetag-translate), or run this; the key arrives in that inbox (one key per email, 1,000,000 free tokens, one time, no monthly reset):
 
 ```bash
 curl -X POST https://onetagai.com/api/signup -H "Content-Type: application/json" -d '{"email":"you@example.com"}'
