@@ -1,0 +1,14 @@
+{
+  "name": "starlight-onetag-translate",
+  "version": "0.1.0",
+  "description": "Translate any Starlight docs page for the reader with one click: a \"Read in <language>\" button, AI translation in the browser, no backend and no translation files to maintain.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["astro", "starlight", "starlight-plugin", "withastro", "docs", "translate", "translation", "i18n", "ai", "onetag", "no-backend"],
+  "repository": { "type": "git", "url": "git+https://github.com/fengyiqicoder/starlight-onetag-translate.git" },
+  "homepage": "https://github.com/fengyiqicoder/starlight-onetag-translate",
+  "exports": { ".": "./index.js", "./client": "./client.js" },
+  "files": ["index.js", "client.js", "plugin.js", "shared.js", "README.md", "LICENSE"],
+  "dependencies": { "onetagai": "^1.2.0" },
+  "peerDependencies": { "@astrojs/starlight": ">=0.32.0", "astro": ">=5.0.0" }
+}
