@@ -1,5 +1,23 @@
 // Browser side of starlight-onetag-translate.
-import { addStyle, BASE_CSS, contentRoot, el, errorText, hash, loadSdk, store, demoNote } from './shared.js';
+import { addStyle, BASE_CSS, contentRoot, el, errorText, hash, isLocal, loadSdk, store, demoNote } from './shared.js';
+
+// Chrome's built-in Translator API: on-device, free, no key. Codes follow its naming.
+function browserCode(c) {
+	c = String(c || '').toLowerCase();
+	if (/^zh-(tw|hk|mo|hant)/.test(c)) return 'zh-Hant';
+	return c.split('-')[0];
+}
+async function browserTranslator(from, to) {
+	if (!('Translator' in self)) return null;
+	try {
+		const opts = { sourceLanguage: browserCode(from), targetLanguage: browserCode(to) };
+		const a = await self.Translator.availability(opts);
+		if (a === 'unavailable') return null;
+		return await self.Translator.create(opts);
+	} catch {
+		return null;
+	}
+}
 
 const SKIP = 'pre, code, kbd, samp, script, style, svg, .expressive-code, [translate="no"], .notranslate, [data-onetag-ui], .sl-anchor-link';
 const PREF = 'starlight-onetag-translate:lang';
@@ -79,7 +97,8 @@ export default function init(cfg) {
 	);
 	const quick = reader ? el('button', { type: 'button', class: 'onetag-btn', onclick: () => translate(reader) }, globe(), 'Read in ' + name(reader)) : null;
 	const original = el('button', { type: 'button', class: 'onetag-link', hidden: true, onclick: () => restore(true) }, 'Show original');
-	const note = demoNote(cfg);
+	// The demo-key note only matters when the browser cannot translate on its own.
+	const note = 'Translator' in self ? null : demoNote(cfg);
 	const bar = el('div', { class: 'onetag-translate', 'data-onetag-ui': '' }, quick, select, status, original);
 	h1.after(bar);
 	if (note) bar.after(note), note.setAttribute('data-onetag-ui', '');
@@ -125,6 +144,32 @@ export default function init(cfg) {
 		apply();
 		const todo = batches(texts, cfg.batchChars).filter((b) => b.some((i) => result[i] == null));
 		try {
+			// Without a key, use the reader's browser when it can translate on its own.
+			const local = cfg.engine === 'browser' || (cfg.engine !== 'onetag' && !cfg.key);
+			const tr = local && todo.length ? await browserTranslator(pageLang, lang) : null;
+			if (tr) {
+				const ids = todo.flat();
+				let done = 0;
+				const work = async () => {
+					while (ids.length) {
+						const i = ids.shift();
+						result[i] = await tr.translate(texts[i]);
+						if (signal.aborted) return;
+						nodes[i].nodeValue = originals[i].match(/^\s*/)[0] + result[i] + originals[i].match(/\s*$/)[0];
+						if (++done % 20 === 0) status.textContent = `Translating ${Math.round((done / texts.length) * 100)}%…`;
+					}
+				};
+				status.textContent = 'Translating in your browser…';
+				await Promise.all([work(), work(), work(), work()]);
+				if (signal.aborted) return;
+				status.textContent = 'Translated in your browser.';
+				original.hidden = false;
+				if (cfg.cache) store(cacheKey, result.map((t, i) => t ?? texts[i]));
+				return;
+			}
+			if (!cfg.key && !isLocal() && cfg.engine !== 'onetag')
+				throw Object.assign(new Error('Translation works in a recent Chrome. In other browsers the site owner can add a free OneTag AI key.'), { code: 'no_browser' });
+			if (cfg.engine === 'browser') throw Object.assign(new Error('This browser cannot translate pages on its own. Try a recent Chrome.'), { code: 'no_browser' });
 			const sdk = todo.length ? await loadSdk(cfg.site) : null;
 			for (let k = 0; k < todo.length; k++) {
 				status.textContent = `Translating ${k + 1}/${todo.length}…`;

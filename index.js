@@ -14,6 +14,7 @@ export default function starlightOnetagTranslate(options = {}) {
 			key: options.key ?? '',
 			site: options.site ?? 'https://onetagai.com',
 			languages: options.languages ?? ['en', 'zh-CN', 'zh-TW', 'ja', 'ko', 'es', 'pt-BR', 'fr', 'de', 'ru', 'it', 'tr', 'vi', 'id', 'ar', 'hi'],
+			engine: options.engine ?? 'auto',
 			remember: options.remember ?? true,
 			cache: options.cache ?? true,
 			batchChars: options.batchChars ?? 3500,

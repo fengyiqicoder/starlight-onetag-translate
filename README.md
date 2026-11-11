@@ -4,6 +4,7 @@ Let readers read your [Starlight](https://starlight.astro.build) docs in their o
 
 ![starlight-onetag-translate on a Starlight page](https://raw.githubusercontent.com/fengyiqicoder/starlight-onetag-translate/main/screenshot.png)
 
+- **No key needed in Chrome.** Without a key, the page is translated by the reader's own browser, on their device (Chrome's built-in Translator). With a free OneTag AI key, every browser gets AI translation that reads more naturally.
 - The button offers the reader's browser language; a menu lists 16 more.
 - Code blocks, inline code, commands and URLs are left untouched; links and formatting stay in place.
 - The choice is remembered, so the next pages open already translated. **Show original** switches back.
@@ -53,6 +54,7 @@ The key is designed to be public, like an analytics ID: it ends up in the built 
 | --- | --- | --- |
 | `key` | `""` (or `PUBLIC_ONETAG_KEY`) | The OneTag AI key. |
 | `languages` | 16 common languages | Language codes offered in the menu. |
+| `engine` | `"auto"` | `"auto"`: OneTag AI when a key is set, else the reader's browser. `"browser"` or `"onetag"` to force one. |
 | `remember` | `true` | Translate the next pages into the language the reader picked. |
 | `cache` | `true` | Keep translations in the reader's browser. |
 | `batchChars` | `3500` | Characters sent per request; long pages are translated in several. |
